@@ -2,14 +2,20 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <windows.h>
 
+//класс для отображения виселицы
 class HangmanVisual 
 {
 public:
     HangmanVisual() : incorrectGuesses(0) {}
 
-    void displayHangman() const {
-        switch (incorrectGuesses) {
+    //отобразить текущее состояние виселицы
+    void displayHangman() const 
+    {
+        // Вывод состояние виселицы в зависимости от кол-ва ошибьок
+        switch (incorrectGuesses) 
+        {
         case 0:
             std::cout << "   _________" << std::endl;
             std::cout << "   |        |" << std::endl;
@@ -62,11 +68,13 @@ public:
         }
     }
 
+    //Увеличить счетчик ошибок
     void incrementIncorrectGuesses() 
     {
         incorrectGuesses++;
     }
 
+    // Получить количество ошибочных попыток
     int getIncorrectGuesses() const 
     {
         return incorrectGuesses;
@@ -75,11 +83,16 @@ private:
     int incorrectGuesses;
 };
 
+
 class HangmanBase 
 {
 public:
     HangmanBase(const std::string& word) : secretWord(word) 
     {
+        if (secretWord.empty())
+        {
+            throw std::invalid_argument("Слово не может быть пустым");
+        }
         guessedWord = std::string(secretWord.length(), '_');
     }
 
@@ -97,11 +110,13 @@ public:
         std::cout << std::endl;
     }
 
+    // Проверка завершения игры
     bool isGameOver() const 
     {
         return hangmanVisual.getIncorrectGuesses() >= maxIncorrectGuesses || guessedWord == secretWord;
     }
 
+    // Проверка на победу игрока
     bool playerWins() const 
     {
         return guessedWord == secretWord;
@@ -117,11 +132,13 @@ protected:
     HangmanVisual hangmanVisual;
     const int maxIncorrectGuesses = 6;
 
+    // Обновление угаданного слова после угадывания буквы
     virtual void updateGuessedWord(char letter) 
     {
         for (size_t i = 0; i < secretWord.length(); ++i)
         {
-            if (secretWord[i] == letter) {
+            if (secretWord[i] == letter) 
+            {
                 guessedWord[i] = letter;
             }
         }
@@ -158,14 +175,17 @@ public:
 int main() 
 {
 	setlocale(LC_ALL, "rus");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
     std::string word;
     std::cout << "Игрок 1, введите слово: ";
     std::cin >> word;
 
     HangmanGame game(word);
 
-    while (!game.isGameOver()) {
-        system("cls"); // Очистка консоли (для Windows)
+    while (!game.isGameOver()) 
+    {
+        system("cls");
         game.displayGameStatus();
 
         char guess;
@@ -176,7 +196,7 @@ int main()
     }
 
     if (game.playerWins()) {
-        std::cout << "Поздравляю! Игрок 2 выиграл. Загаданное слово: " << word << std::endl;
+        std::cout << "Игрок 2 выиграл. Загаданное слово: " << word << std::endl;
     }
     else {
         std::cout << "Игрок 2 проиграл. Загаданное слово: " << word << std::endl;
